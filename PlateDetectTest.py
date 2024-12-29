@@ -1,4 +1,4 @@
-#coding:utf-8
+# coding:utf-8
 from ultralytics import YOLO
 import cv2
 # 所需加载的模型目录
