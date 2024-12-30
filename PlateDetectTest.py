@@ -1,20 +1,20 @@
 # coding:utf-8
 from ultralytics import YOLO
 import cv2
-# 所需加载的模型目录
+# model address
 path = 'models/best.pt'
-# 需要检测的图片地址
+# picture address
 img_path = "TestFiles/013828125-90_259-275&449_491&514-491&514_285&511_275&450_485&449-0_0_3_25_33_33_31_33-164-249.jpg"
 
 
-# 加载预训练模型
+# Load the trained model
 # conf	0.25	object confidence threshold for detection
 # iou	0.7	intersection over union (IoU) threshold for NMS
 model = YOLO(path, task='detect')
 # model = YOLO(path, task='detect',conf=0.5)
 
 
-# 检测图片
+# Detect image
 results = model(img_path)
 res = results[0].plot()
 # res = cv2.resize(res,dsize=None,fx=0.3,fy=0.3,interpolation=cv2.INTER_LINEAR)
