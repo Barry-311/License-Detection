@@ -20,19 +20,19 @@ def get_license_result(ocr,image):
     else:
         return None, None
 
-# 需要检测的图片地址
-img_path = "TestFiles/013671875-93_102-226&489_426&558-426&558_234&546_226&489_417&494-0_0_5_25_33_24_24_33-86-80.jpg"
+# Test Image Path
+img_path = "TestFiles/015859375-90_261-217&496_449&565-449&565_226&559_217&496_448&497-0_0_3_24_33_33_33_25-99-69.jpg"
 now_img = tools.img_cvread(img_path)
 
 fontC = ImageFont.truetype("Font/platech.ttf", 50, 0)
-# 加载ocr模型
+# Paddleocr model
 cls_model_dir='paddleModels/whl/cls/ch_ppocr_mobile_v2.0_cls_infer'
 rec_model_dir='paddleModels/whl/rec/ch/ch_PP-OCRv4_rec_infer'
 ocr = PaddleOCR(use_angle_cls=False, lang="ch", det=False, cls_model_dir=cls_model_dir,rec_model_dir=rec_model_dir)
 
-# 所需加载的模型目录
+# Yolo trained model
 path = 'models/best.pt'
-# 加载预训练模型
+# Load model
 # conf	0.25	object confidence threshold for detection
 # iou	0.7	int.ersection over union (IoU) threshold for NMS
 model = YOLO(path, task='detect')
@@ -51,7 +51,7 @@ if len(location_list) >= 1:
         license_imgs.append(cropImg)
         cv2.imshow('PlateImage',cropImg)
         cv2.waitKey(0)
-    # 车牌识别结果
+    # License Detection Result
     lisence_res = []
     conf_list = []
     for each in license_imgs:
@@ -60,8 +60,9 @@ if len(location_list) >= 1:
             lisence_res.append(license_num)
             conf_list.append(conf)
         else:
-            lisence_res.append('无法识别')
+            lisence_res.append('Can not detect')
             conf_list.append(0)
+    print(f"Detected plate: {lisence_res[0]}, Confidence: {conf_list[0]}")
     for text, box in zip(lisence_res, location_list):
         now_img = tools.drawRectBox(now_img, box, text, fontC)
 
