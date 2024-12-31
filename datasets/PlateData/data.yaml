@@ -1,9 +1,6 @@
-train: F:\Pycharm\CV_final\CV_License_Detect\datasets\PlateData\images\train  # train images (relative to 'path') 128 images
-val: F:\Pycharm\CV_final\CV_License_Detect\datasets\PlateData\images\val  # val images (relative to 'path') 128 images
-test:  F:\Pycharm\CV_final\CV_License_Detect\datasets\PlateData\images\test # val images (optional)
-
-# number of classes
+names:
+- LicensePlate
 nc: 1
-
-# Classes
-names: ['LicensePlate']
+test: C:\Users\Leemi\PycharmProjects\License-Detection/datasets/PlateData/images/test
+train: C:\Users\Leemi\PycharmProjects\License-Detection/datasets/PlateData/images/train
+val: C:\Users\Leemi\PycharmProjects\License-Detection/datasets/PlateData/images/val

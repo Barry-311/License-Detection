@@ -44,13 +44,13 @@ def txt_translate(path, txt_path):
 
 if __name__ == '__main__':
     # det image
-    trainDir = r"F:/Pycharm/CV_final/CCPD2020/ccpd_green/train/"
-    validDir = r"F:/Pycharm/CV_final/CCPD2020/ccpd_green/val/"
-    testDir = r"F:/Pycharm/CV_final/CCPD2020/ccpd_green/test/"
+    trainDir = r"./CCPD2020/ccpd_green/train/"
+    validDir = r"./CCPD2020/ccpd_green/val/"
+    testDir = r"./CCPD2020/ccpd_green/test/"
     # det txt
-    train_txt_path = r"F:/Pycharm/CV_final/CCPD2020/ccpd_green/train_labels/"
-    val_txt_path = r"F:/Pycharm/CV_final/CCPD2020/ccpd_green/val_labels/"
-    test_txt_path = r"F:/Pycharm/CV_final/CCPD2020/ccpd_green/test_labels/"
+    train_txt_path = r"./CCPD2020/ccpd_green/train_labels/"
+    val_txt_path = r"./CCPD2020/ccpd_green/val_labels/"
+    test_txt_path = r"./CCPD2020/ccpd_green/test_labels/"
     txt_translate(trainDir, train_txt_path)
     txt_translate(validDir, val_txt_path)
     txt_translate(testDir, test_txt_path)
