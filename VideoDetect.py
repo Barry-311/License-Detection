@@ -29,6 +29,7 @@ ocr = PaddleOCR(use_angle_cls=False, lang="ch", det=False, cls_model_dir=cls_mod
 # 初始化YOLO模型
 path = 'models/best.pt'
 model = YOLO(path, task='detect')
+print(model._version)
 
 # 加载字体
 fontC = ImageFont.truetype("Font/platech.ttf", 30, 0)  # 调整字体大小
@@ -108,13 +109,17 @@ while cap.isOpened():
 
                 # 将车牌图片放置在图层中
                 plate_resized = cv2.resize(img, (overlay_width, overlay_height // 2))
-                overlay[:overlay_height // 2, :, :] = cv2.cvtColor(plate_resized, cv2.COLOR_GRAY2BGR)
+                # 如果当前图像是灰度图，则转换为三通道
+                if len(plate_resized.shape) == 2:  # 灰度图只有 2 个维度
+                    plate_resized = cv2.cvtColor(plate_resized, cv2.COLOR_GRAY2BGR)
+                overlay[:overlay_height // 2, :, :] = plate_resized
 
                 # 在图层上绘制车牌信息和置信度（两行）
                 pil_overlay = Image.fromarray(overlay)
                 draw = ImageDraw.Draw(pil_overlay)
                 draw.text((10, overlay_height // 2 + 10), text, font=fontC, fill=(255, 255, 255))  # 第一行：车牌信息
-                draw.text((10, overlay_height // 2 + 50), f"置信度: {conf:.2f}", font=fontC, fill=(255, 255, 255))  # 第二行：置信度
+                draw.text((10, overlay_height // 2 + 50), f"Conf: {conf:.2f}", font=fontC,
+                          fill=(255, 255, 255))  # 第二行：置信度
                 current_overlay = np.array(pil_overlay)  # 更新当前图层
 
     # 如果有激活的图层，将其显示在右上角
