@@ -70,18 +70,4 @@ def cvimg_to_qpiximg(cvimg):
     return qpix_img
 
 
-# Show Chinese on image
-def cv2AddChineseText(img, text, position, textColor=(0, 255, 0), textSize=50):
-    if (isinstance(img, np.ndarray)):  # Check if opencv
-        img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-    draw = ImageDraw.Draw(img)
-    # Font
-    fontStyle = ImageFont.truetype(
-        "simsun.ttc", textSize, encoding="utf-8")
-    # Draw text
-    draw.text(position, text, textColor, font=fontStyle)
-    # Return opencv
-    return cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR)
-
-
 

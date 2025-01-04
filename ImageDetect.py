@@ -8,8 +8,8 @@ from paddleocr import PaddleOCR
 
 def get_license_result(ocr,image):
     """
-    image:输入的车牌截取照片
-    输出，车牌号与置信度
+    image:input plate image
+    output: license and confidence
     """
     result = ocr.ocr(image, cls=True)[0]
     if result:
