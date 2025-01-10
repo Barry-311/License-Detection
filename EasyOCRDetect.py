@@ -3,7 +3,7 @@ from ultralytics import YOLO
 import cv2
 import DetectTools as tools
 from PIL import ImageFont, ImageDraw, Image
-from paddleocr import PaddleOCR
+from easyocr import Reader
 import numpy as np
 import time
 
@@ -12,19 +12,17 @@ def get_license_result(ocr, image):
     image: 输入的车牌截取照片
     输出：车牌号与置信度
     """
-    result = ocr.ocr(image, cls=True)[0]
+    result = ocr.readtext(image)
     if result:
-        license_name, conf = result[0][1]
+        license_name, conf = result[0][1], result[0][2]
         if '·' in license_name:
             license_name = license_name.replace('·', '')
         return license_name, conf
     else:
         return None, None
 
-# 初始化PaddleOCR模型
-cls_model_dir = 'paddleModels/whl/cls/ch_ppocr_mobile_v2.0_cls_infer'
-rec_model_dir = 'paddleModels/whl/rec/ch/ch_PP-OCRv4_rec_infer'
-ocr = PaddleOCR(use_angle_cls=False, lang="ch", det=False,  rec_model_dir=rec_model_dir)
+# 初始化EasyOCR模型
+ocr = Reader(['ch_sim', 'en'])
 
 # 初始化YOLO模型
 path = 'models/best.pt'
@@ -48,8 +46,6 @@ current_license = None  # 保存当前显示的车牌号
 
 # 开关：是否启用预处理
 enable_preprocessing = False
-
-valid_frames = 0
 
 # 播放控制开关
 paused = False
@@ -80,16 +76,16 @@ while cap.isOpened():
                     gray_img = cv2.cvtColor(crop_img, cv2.COLOR_BGR2GRAY)  # 转换为灰度图
                     binary_img = cv2.adaptiveThreshold(gray_img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
                                                        cv2.THRESH_BINARY, 11, 2)  # 自适应阈值
-                    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 1))
+                    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
                     preprocessed_img = cv2.morphologyEx(binary_img, cv2.MORPH_OPEN, kernel)  # 开运算
 
-                    # 转换为三通道以兼容 PaddleOCR
+                    # 转换为三通道以兼容 EasyOCR
                     preprocessed_img = cv2.cvtColor(preprocessed_img, cv2.COLOR_GRAY2BGR)
                     license_imgs.append(preprocessed_img)
                 else:
                     license_imgs.append(crop_img)
 
-            # PaddleOCR识别车牌号
+            # EasyOCR识别车牌号
             lisence_res = []
             conf_list = []
             for each in license_imgs:
@@ -98,7 +94,7 @@ while cap.isOpened():
                     lisence_res.append(license_num)
                     conf_list.append(conf)
                 else:
-                    lisence_res.append('无法识别')
+                    lisence_res.append('OCR Failed')
                     conf_list.append(0)
 
             # 在视频帧上绘制检测结果
@@ -106,7 +102,7 @@ while cap.isOpened():
                 frame = tools.drawRectBox(frame, box, text, fontC)
 
                 # 如果置信度大于 0.95 且车牌内容发生变化，更新右上角图层
-                if conf > 0.95 and text != current_license:
+                if conf > 0.75 and text != current_license:
                     current_license = text  # 更新当前车牌内容
                     overlay_height = frame.shape[0] // 4
                     overlay_width = frame.shape[1] // 6
@@ -123,8 +119,6 @@ while cap.isOpened():
                     draw.text((10, overlay_height // 2 + 50), f"Conf: {conf:.2f}", font=fontC,
                               fill=(255, 255, 255))  # 第二行：置信度
                     current_overlay = np.array(pil_overlay)  # 更新当前图层
-            if conf > 0.95:
-                valid_frames += 1
 
         # 如果有激活的图层，将其显示在右上角
         if current_overlay is not None:
@@ -138,7 +132,7 @@ while cap.isOpened():
         elapsed_time = time.time() - start_time
         if elapsed_time > max_frame_duration:
             # 跳过若干帧
-            #print("The duration of this frame is ", elapsed_time, "\n")
+            print("The duration of this frame is ", elapsed_time, "\n")
             skip_frames = int(elapsed_time / frame_duration) - 1
             for _ in range(skip_frames):
                 cap.read()
@@ -149,7 +143,6 @@ while cap.isOpened():
     elif key == ord(' '):  # 按空格键暂停或恢复
         paused = not paused
 
-print("Overall valid frames =",valid_frames)
 # 释放资源
 cap.release()
 cv2.destroyAllWindows()
